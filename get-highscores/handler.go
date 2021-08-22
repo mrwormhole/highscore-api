@@ -19,13 +19,12 @@ func Handle(req handler.Request) (handler.Response, error) {
 		os.Getenv("POSTGRES_PORT"),
 		os.Getenv("POSTGRES_USER"),
 		os.Getenv("POSTGRES_DB")))
-
 	if err != nil {
 		errMsg := fmt.Sprintf("failed to connect to db: %v", err)
 		return handler.Response{
 			Body:       []byte(errMsg),
 			StatusCode: 500,
-		}, fmt.Errorf("failed to connect to db: %v", err)
+		}, fmt.Errorf(errMsg)
 	}
 
 	queries := repository.New(db)
@@ -48,8 +47,16 @@ func Handle(req handler.Request) (handler.Response, error) {
 		}, fmt.Errorf(errMsg)
 	}
 
+	err = db.Close()
+	if err != nil {
+		errMsg := fmt.Sprintf("failed to close db: %v", err)
+		return handler.Response{
+			Body:       []byte(errMsg),
+			StatusCode: 500,
+		}, fmt.Errorf(errMsg)
+	}
 	return handler.Response{
 		Body:       rawBody,
 		StatusCode: http.StatusOK,
-	}, err
+	}, nil
 }
