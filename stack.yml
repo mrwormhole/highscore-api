@@ -1,0 +1,17 @@
+version: 1.0
+provider:
+  name: openfaas
+  gateway: http://23.88.60.124:8080
+functions:
+  get-highscores:
+    lang: golang-http
+    handler: ./get-highscores
+    image: mrwormhole/get-highscores:latest
+    build_args:
+      GO111MODULE: on
+    environment:
+      POSTGRES_HOST: 127.0.0.1
+      POSTGRES_PORT: 26257
+      POSTGRES_USER: root
+      POSTGRES_DB: highscore_db
+

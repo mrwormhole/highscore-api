@@ -1,0 +1,11 @@
+{
+  "version": "1",
+  "packages": [
+    {
+      "path": "repository",
+      "name": "repository",
+      "queries": "queries.sql",
+      "schema": "schema.sql"
+    }
+  ]
+}
