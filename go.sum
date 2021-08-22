@@ -1,2 +1,4 @@
+github.com/lib/pq v1.10.2 h1:AqzbZs4ZoCBp+GtejcpCpcxM3zlSMx29dXbUSeVtJb8=
+github.com/lib/pq v1.10.2/go.mod h1:AlVN5x4E4T544tWzH6hKfbfQvm3HdbOxrmggDNAPY9o=
 github.com/openfaas/templates-sdk v0.0.0-20200723110415-a699ec277c12 h1:P5IjrDQug3GRIfNC9/S7+UvXAbNdenhnHtjz4Qs8Kd8=
 github.com/openfaas/templates-sdk v0.0.0-20200723110415-a699ec277c12/go.mod h1:JWcVHdzlHcR7nLuaDL88Mz68wOqDvOn0CLO6t27OMhk=

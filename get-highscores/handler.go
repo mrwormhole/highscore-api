@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 
+	_ "github.com/lib/pq"
 	"github.com/mrwormhole/highscore-api/repository"
 	handler "github.com/openfaas/templates-sdk/go-http"
 )
@@ -18,9 +19,11 @@ func Handle(req handler.Request) (handler.Response, error) {
 		os.Getenv("POSTGRES_PORT"),
 		os.Getenv("POSTGRES_USER"),
 		os.Getenv("POSTGRES_DB")))
+
 	if err != nil {
+		errMsg := fmt.Sprintf("failed to connect to db: %v", err)
 		return handler.Response{
-			Body:       nil,
+			Body:       []byte(errMsg),
 			StatusCode: 500,
 		}, fmt.Errorf("failed to connect to db: %v", err)
 	}
@@ -29,18 +32,20 @@ func Handle(req handler.Request) (handler.Response, error) {
 
 	highscores, err := queries.ListHighscores(req.Context())
 	if err != nil {
+		errMsg := fmt.Sprintf("failed to list highscores: %v", err)
 		return handler.Response{
-			Body:       nil,
-			StatusCode: 400,
-		}, fmt.Errorf("failed to list highscores: %v", err)
+			Body:       []byte(errMsg),
+			StatusCode: 500,
+		}, fmt.Errorf(errMsg)
 	}
 
 	rawBody, err := json.Marshal(highscores)
 	if err != nil {
+		errMsg := fmt.Sprintf("failed to marshal highscores: %v", err)
 		return handler.Response{
-			Body:       nil,
-			StatusCode: 400,
-		}, fmt.Errorf("failed to marshal highscores: %v", err)
+			Body:       []byte(errMsg),
+			StatusCode: 500,
+		}, fmt.Errorf(errMsg)
 	}
 
 	return handler.Response{
