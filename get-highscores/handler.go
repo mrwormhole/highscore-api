@@ -48,6 +48,7 @@ func Handle(req handler.Request) (handler.Response, error) {
 	queries := repository.New(db)
 	username := values.Get("username")
 	var rawBody []byte
+
 	if strings.TrimSpace(username) != "" {
 		highscore, err := queries.GetHighscore(req.Context(), username)
 		if err != nil {

@@ -8,12 +8,8 @@ import (
 )
 
 const createHighscore = `-- name: CreateHighscore :one
-INSERT INTO highscores (
-  username, score
-) VALUES (
-  $1, $2
-)
-RETURNING id, username, score
+INSERT INTO highscores (username, score) 
+VALUES ($1, $2) RETURNING id, username, score
 `
 
 type CreateHighscoreParams struct {
@@ -76,4 +72,22 @@ func (q *Queries) ListHighscores(ctx context.Context) ([]Highscore, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateHighscore = `-- name: UpdateHighscore :one
+UPDATE highscores
+SET score = GREATEST(score, $2) 
+WHERE id = $1 RETURNING id, username, score
+`
+
+type UpdateHighscoreParams struct {
+	ID    int64
+	Score int32
+}
+
+func (q *Queries) UpdateHighscore(ctx context.Context, arg UpdateHighscoreParams) (Highscore, error) {
+	row := q.db.QueryRowContext(ctx, updateHighscore, arg.ID, arg.Score)
+	var i Highscore
+	err := row.Scan(&i.ID, &i.Username, &i.Score)
+	return i, err
 }

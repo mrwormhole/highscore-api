@@ -15,3 +15,15 @@ functions:
       POSTGRES_USER: root
       POSTGRES_DB: highscore_db
 
+  post-highscore:
+    lang: golang-http
+    handler: ./post-highscore
+    image: post-highscore:latest
+    build_args:
+      GO111MODULE: on
+    environment:
+      POSTGRES_HOST: 23.88.60.124
+      POSTGRES_PORT: 26257
+      POSTGRES_USER: root
+      POSTGRES_DB: highscore_db
+

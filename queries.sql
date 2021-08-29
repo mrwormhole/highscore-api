@@ -7,12 +7,13 @@ SELECT * FROM highscores
 ORDER BY score;
 
 -- name: CreateHighscore :one
-INSERT INTO highscores (
-  username, score
-) VALUES (
-  $1, $2
-)
-RETURNING *;
+INSERT INTO highscores (username, score) 
+VALUES ($1, $2) RETURNING *;
+
+-- name: UpdateHighscore :one
+UPDATE highscores
+SET score = GREATEST(score, $2) 
+WHERE id = $1 RETURNING *;
 
 -- name: DeleteHighscore :exec
 DELETE FROM highscores
