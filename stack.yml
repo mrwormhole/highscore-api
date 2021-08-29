@@ -27,3 +27,16 @@ functions:
       POSTGRES_USER: root
       POSTGRES_DB: highscore_db
 
+  delete-highscore:
+    lang: golang-http
+    handler: ./delete-highscore
+    image: delete-highscore:latest
+    build_args:
+      GO111MODULE: on
+    environment:
+      POSTGRES_HOST: 23.88.60.124
+      POSTGRES_PORT: 26257
+      POSTGRES_USER: root
+      POSTGRES_DB: highscore_db
+      AUTH_HEADER_TOKEN: QeV5f7eSvJnO0dDYCc9DcH5BEwpm7P3j
+
