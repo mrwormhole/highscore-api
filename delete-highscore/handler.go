@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 
+	_ "github.com/lib/pq"
 	"github.com/mrwormhole/highscore-api/repository"
 	handler "github.com/openfaas/templates-sdk/go-http"
 )
@@ -37,13 +38,13 @@ func Handle(req handler.Request) (handler.Response, error) {
 	authorizationHeader := req.Header.Get("Authorization")
 	authorizationHeaderValues := strings.Split(authorizationHeader, " ")
 	if len(authorizationHeaderValues) != 2 || authorizationHeaderValues[0] != "Bearer" {
-		errMsg := "authorization heaeder is in the wrong format"
+		errMsg := "authorization header is in the wrong format"
 		return handler.Response{
 			Body: []byte(errMsg),
 		}, fmt.Errorf(errMsg)
 	}
-	if authorizationHeaderValues[1] != os.Getenv("AUTH_HEADER_TOKEN") {
-		errMsg := "authorization heaeder token is not valid"
+	if authorizationHeaderValues[1] != os.Getenv("BEARER_TOKEN") {
+		errMsg := "bearer token is not valid"
 		return handler.Response{
 			Body: []byte(errMsg),
 		}, fmt.Errorf(errMsg)
@@ -59,7 +60,7 @@ func Handle(req handler.Request) (handler.Response, error) {
 	}
 
 	queries := repository.New(db)
-	username := values.Get("username")
+	username := strings.ToLower(values.Get("username"))
 
 	if strings.TrimSpace(username) != "" {
 		err = queries.DeleteHighscore(req.Context(), username)

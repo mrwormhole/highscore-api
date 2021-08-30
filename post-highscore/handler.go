@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 
+	_ "github.com/lib/pq"
 	"github.com/mrwormhole/highscore-api/model"
 	"github.com/mrwormhole/highscore-api/repository"
 	handler "github.com/openfaas/templates-sdk/go-http"
@@ -36,16 +38,25 @@ func Handle(req handler.Request) (handler.Response, error) {
 
 	var highscore model.Highscore
 	json.Unmarshal(req.Body, &highscore)
+	highscore.Username = strings.ToLower(highscore.Username)
 
 	queries := repository.New(db)
-	_, err = queries.GetHighscore(req.Context(), highscore.Username)
+	existingHighscore, err := queries.GetHighscore(req.Context(), highscore.Username)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			errMsg := fmt.Sprintf("123failed to get a highscore: %v", err)
+			params := repository.CreateHighscoreParams{Username: highscore.Username, Score: int32(highscore.Score)}
+			_, err = queries.CreateHighscore(req.Context(), params)
+			if err != nil {
+				errMsg := fmt.Sprintf("failed to create a highscore: %v", err)
+				return handler.Response{
+					Body:       []byte(errMsg),
+					StatusCode: 500,
+				}, fmt.Errorf(errMsg)
+			}
 			return handler.Response{
-				Body:       []byte(errMsg),
-				StatusCode: 500,
-			}, fmt.Errorf(errMsg)
+				Body:       []byte(fmt.Sprintf("created a highscore for username %v", highscore.Username)),
+				StatusCode: 200,
+			}, nil
 		}
 		errMsg := fmt.Sprintf("failed to get a highscore: %v", err)
 		return handler.Response{
@@ -54,8 +65,15 @@ func Handle(req handler.Request) (handler.Response, error) {
 		}, fmt.Errorf(errMsg)
 	}
 
-	//queries.CreateHighscore(req.Context(), repository.CreateHighscoreParams{Username: "JACK", Score: 555})
-	//queries.UpdateHighscore(req.Context(), repository.UpdateHighscoreParams{ID: 4, Score: 555})
+	params := repository.UpdateHighscoreParams{ID: existingHighscore.ID, Score: existingHighscore.Score}
+	_, err = queries.UpdateHighscore(req.Context(), params)
+	if err != nil {
+		errMsg := fmt.Sprintf("failed to update a highscore: %v", err)
+		return handler.Response{
+			Body:       []byte(errMsg),
+			StatusCode: 500,
+		}, fmt.Errorf(errMsg)
+	}
 
 	err = db.Close()
 	if err != nil {
@@ -66,6 +84,7 @@ func Handle(req handler.Request) (handler.Response, error) {
 		}, fmt.Errorf(errMsg)
 	}
 	return handler.Response{
+		Body:       []byte(fmt.Sprintf("update a highscore for username %v", existingHighscore.Username)),
 		StatusCode: http.StatusOK,
 	}, nil
 }

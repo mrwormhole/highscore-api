@@ -14,11 +14,11 @@ functions:
       POSTGRES_PORT: 26257
       POSTGRES_USER: root
       POSTGRES_DB: highscore_db
-
+      
   post-highscore:
     lang: golang-http
     handler: ./post-highscore
-    image: post-highscore:latest
+    image: mrwormhole/post-highscore:latest
     build_args:
       GO111MODULE: on
     environment:
@@ -30,7 +30,7 @@ functions:
   delete-highscore:
     lang: golang-http
     handler: ./delete-highscore
-    image: delete-highscore:latest
+    image: mrwormhole/delete-highscore:latest
     build_args:
       GO111MODULE: on
     environment:
@@ -38,5 +38,5 @@ functions:
       POSTGRES_PORT: 26257
       POSTGRES_USER: root
       POSTGRES_DB: highscore_db
-      AUTH_HEADER_TOKEN: QeV5f7eSvJnO0dDYCc9DcH5BEwpm7P3j
+      BEARER_TOKEN: QeV5f7eSvJnO0dDYCc9DcH5BEwpm7P3j
 
