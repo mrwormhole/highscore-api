@@ -28,60 +28,53 @@ func Handle(req handler.Request) (handler.Response, error) {
 		}
 	}()
 	if err != nil {
-		log.Printf("failed to connect to db: %v", err)
 		return handler.Response{
 			StatusCode: http.StatusInternalServerError,
-		}, err
+		}, fmt.Errorf("failed to connect to db: %v", err)
 	}
 	if req.Method != http.MethodPost {
-		log.Printf("invalid http method %s", req.Method)
 		return handler.Response{
 			StatusCode: http.StatusBadRequest,
-		}, nil
+		}, fmt.Errorf("invalid http method %s", req.Method)
 	}
 
 	err = middleware.Authorization(req)
 	if err != nil {
-		log.Printf("%v", err)
 		return handler.Response{
 			StatusCode: http.StatusBadRequest,
-		}, err
+		}, fmt.Errorf("%v", err)
 	}
 
 	var highscore model.Highscore
 	err = json.Unmarshal(req.Body, &highscore)
 	if err != nil {
-		log.Printf("failed to unmarshal highscore")
 		return handler.Response{
 			StatusCode: http.StatusInternalServerError,
-		}, err
+		}, fmt.Errorf("failed to unmarshal highscore")
 	}
 
 	queries := repository.New(db)
 	existingHighscore, err := queries.GetHighscore(req.Context(), highscore.Username)
 	if err != nil && err != sql.ErrNoRows {
-		log.Printf("failed to get a highscore: %v", err)
 		return handler.Response{
 			StatusCode: http.StatusInternalServerError,
-		}, err
+		}, fmt.Errorf("failed to get a highscore: %v", err)
 	}
 
 	if existingHighscore.ID == 0 && existingHighscore.Score == 0 {
-		params := repository.CreateHighscoreParams{Username: highscore.Username, Score: int32(highscore.Score)}
+		params := repository.CreateHighscoreParams{Username: highscore.Username, Score: highscore.Score}
 		createdHighscore, err := queries.CreateHighscore(req.Context(), params)
 		if err != nil {
-			log.Printf("failed to create a highscore: %v", err)
 			return handler.Response{
 				StatusCode: http.StatusInternalServerError,
-			}, err
+			}, fmt.Errorf("failed to create a highscore: %v", err)
 		}
 
 		raw, err := json.Marshal(createdHighscore)
 		if err != nil {
-			log.Printf("failed to marshal created highscore")
 			return handler.Response{
 				StatusCode: http.StatusInternalServerError,
-			}, err
+			}, fmt.Errorf("failed to marshal created highscore")
 		}
 
 		return handler.Response{
@@ -90,23 +83,20 @@ func Handle(req handler.Request) (handler.Response, error) {
 		}, nil
 	}
 
-	if int32(highscore.Score) > existingHighscore.Score {
-		params := repository.UpdateHighscoreParams{ID: existingHighscore.ID, Score: int32(highscore.Score)}
+	if highscore.Score > existingHighscore.Score {
+		params := repository.UpdateHighscoreParams{ID: existingHighscore.ID, Score: highscore.Score}
 		updatedHighscore, err := queries.UpdateHighscore(req.Context(), params)
 		if err != nil {
-			errMsg := fmt.Sprintf("failed to update a highscore: %v", err)
 			return handler.Response{
-				Body:       []byte(errMsg),
 				StatusCode: http.StatusInternalServerError,
-			}, fmt.Errorf(errMsg)
+			}, fmt.Errorf("failed to update a highscore: %v", err)
 		}
 
 		raw, err := json.Marshal(updatedHighscore)
 		if err != nil {
-			log.Printf("failed to marshal updated highscore")
 			return handler.Response{
 				StatusCode: http.StatusInternalServerError,
-			}, err
+			}, fmt.Errorf("failed to marshal updated highscore")
 		}
 
 		return handler.Response{

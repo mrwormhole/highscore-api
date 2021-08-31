@@ -2,5 +2,5 @@ package model
 
 type Highscore struct {
 	Username string `json:"username"`
-	Score    int    `json:"score"`
+	Score    int64  `json:"score"`
 }

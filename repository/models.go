@@ -7,5 +7,5 @@ import ()
 type Highscore struct {
 	ID       int64
 	Username string
-	Score    int32
+	Score    int64
 }

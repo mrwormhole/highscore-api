@@ -28,24 +28,21 @@ func Handle(req handler.Request) (handler.Response, error) {
 		}
 	}()
 	if err != nil {
-		log.Printf("failed to connect to db: %v", err)
 		return handler.Response{
 			StatusCode: http.StatusInternalServerError,
-		}, err
+		}, fmt.Errorf("failed to connect to db: %v", err)
 	}
 	if req.Method != http.MethodGet {
-		log.Printf("invalid http method %s", req.Method)
 		return handler.Response{
 			StatusCode: http.StatusBadRequest,
-		}, nil
+		}, fmt.Errorf("invalid http method %s", req.Method)
 	}
 
 	values, err := url.ParseQuery(req.QueryString)
 	if err != nil {
-		log.Printf("failed to parse query string: %v", err)
 		return handler.Response{
 			StatusCode: http.StatusInternalServerError,
-		}, err
+		}, fmt.Errorf("failed to parse query string: %v", err)
 	}
 
 	var rawBody []byte
@@ -55,39 +52,35 @@ func Handle(req handler.Request) (handler.Response, error) {
 	if strings.TrimSpace(username) != "" {
 		highscore, err := queries.GetHighscore(req.Context(), username)
 		if err != nil {
-			log.Printf("failed to get highscore for username %s: %v", username, err)
 			return handler.Response{
 				StatusCode: http.StatusInternalServerError,
-			}, err
+			}, fmt.Errorf("failed to get highscore for username %s: %v", username, err)
 		}
 
 		rawBody, err = json.Marshal(highscore)
 		if err != nil {
-			log.Printf("failed to marshal a highscore: %v", err)
 			return handler.Response{
 				StatusCode: http.StatusInternalServerError,
-			}, err
+			}, fmt.Errorf("failed to marshal a highscore: %v", err)
 		}
 	} else {
 		highscores, err := queries.ListHighscores(req.Context())
 		if err != nil {
-			log.Printf("failed to list highscores: %v", err)
 			return handler.Response{
 				StatusCode: http.StatusInternalServerError,
-			}, err
+			}, fmt.Errorf("failed to list highscores: %v", err)
 		}
 
 		rawBody, err = json.Marshal(highscores)
 		if err != nil {
-			log.Printf("failed to marshal highscores: %v", err)
 			return handler.Response{
 				StatusCode: http.StatusInternalServerError,
-			}, err
+			}, fmt.Errorf("failed to marshal highscores: %v", err)
 		}
 	}
 
 	return handler.Response{
 		Body:       rawBody,
 		StatusCode: http.StatusOK,
-	}, fmt.Errorf("WELL WELL WELL WELL I AM FAKE")
+	}, nil
 }

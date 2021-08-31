@@ -1,5 +1,5 @@
 CREATE TABLE highscores (
   id BIGSERIAL PRIMARY KEY,
-  username text NOT NULL UNIQUE,
-  score int NOT NULL
+  username TEXT NOT NULL UNIQUE,
+  score BIGINT NOT NULL
 );
