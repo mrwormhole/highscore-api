@@ -26,6 +26,7 @@ functions:
       POSTGRES_PORT: 26257
       POSTGRES_USER: root
       POSTGRES_DB: highscore_db
+      BEARER_TOKEN: QeV5f7eSvJnO0dDYCc9DcH5BEwpm7P3j
 
   delete-highscore:
     lang: golang-http
