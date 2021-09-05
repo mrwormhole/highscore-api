@@ -61,7 +61,7 @@ func Handle(req handler.Request) (handler.Response, error) {
 		}, fmt.Errorf("failed to get a highscore: %v", err)
 	}
 
-	if existingHighscore.ID == 0 && existingHighscore.Score == 0 {
+	if existingHighscore.ID == 0 {
 		params := repository.CreateHighscoreParams{Username: highscore.Username, Score: highscore.Score}
 		createdHighscore, err := queries.CreateHighscore(req.Context(), params)
 		if err != nil {

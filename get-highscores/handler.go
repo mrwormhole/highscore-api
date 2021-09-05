@@ -52,6 +52,11 @@ func Handle(req handler.Request) (handler.Response, error) {
 	if strings.TrimSpace(username) != "" {
 		highscore, err := queries.GetHighscore(req.Context(), username)
 		if err != nil {
+			if err == sql.ErrNoRows {
+				return handler.Response{
+					StatusCode: http.StatusNotFound,
+				}, nil
+			}
 			return handler.Response{
 				StatusCode: http.StatusInternalServerError,
 			}, fmt.Errorf("failed to get highscore for username %s: %v", username, err)

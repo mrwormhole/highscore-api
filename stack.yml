@@ -39,5 +39,5 @@ functions:
       POSTGRES_PORT: 26257
       POSTGRES_USER: root
       POSTGRES_DB: highscore_db
-      BEARER_TOKEN: QeV5f7eSvJnO0dDYCc9DcH5BEwpm7P3j
+      BEARER_TOKEN: Ru4BXyL7ALkey34cUJIIXBF67t1qrw37
 

@@ -58,6 +58,11 @@ func Handle(req handler.Request) (handler.Response, error) {
 	if strings.TrimSpace(username) != "" {
 		err = queries.DeleteHighscore(req.Context(), username)
 		if err != nil {
+			if err == sql.ErrNoRows {
+				return handler.Response{
+					StatusCode: http.StatusNotFound,
+				}, nil
+			}
 			return handler.Response{
 				StatusCode: http.StatusInternalServerError,
 			}, fmt.Errorf("failed to delete a highscore for username %s: %v", username, err)
